@@ -1,58 +1,65 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   solve_sudoku.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nnataraj <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/01/20 17:00:05 by nnataraj          #+#    #+#             */
+/*   Updated: 2019/01/21 15:20:56 by nnataraj         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
 
 int ft_check_collisions(int, int, char);
-int ft_row_check(int, int, char);
-int ft_column_check(int, int, char);
+int ft_row_check(int, char);
+int ft_column_check(int, char);
 int ft_square_check(int, int, char);
+int solve_sudoku(int, int);
 
-char g_sudoku[9][9] = {0};
+char g_sudoku[9][9];
 
 /* 1 - True - Number already present
    0 - False - Number not present*/
 
 int ft_check_collisions(int x, int y, char num)
 {
-    if ((ft_row_check(x, y, num) || ft_column_check(x, y, num) || ft_square_check(x, y, num)) == 1)
+    if ((ft_row_check(y, num) || ft_column_check(x, num) || ft_square_check(x, y, num)) == 1)
     {
-        //write(1, "Collisions - True\n", 18);
         return (1);
     }
     else
     {
-        //write(1, "Collisions - False\n", 19);
         return (0);
     }
 }
 
-int ft_row_check(int x, int y, char num)
+int ft_row_check(int y, char num)
 {
     int row = 0;
     while (row < 9)
     {
         if (g_sudoku[row][y] == num)
         {
-            //write(1, "Row - True\n", 11);
             return (1);
         }
         row++;
     }
-    //write(1, "Row - False\n", 12);
     return (0);
 }
 
-int ft_column_check(int x, int y, char num)
+int ft_column_check(int x, char num)
 {
     int col = 0;
     while (col < 9)
     {
         if (g_sudoku[x][col] == num)
         {
-            //write(1, "Column - True\n", 14);
             return (1);
         }
         col++;
     }
-    //write(1, "Column - False\n", 15);
     return (0);
 }
 
@@ -94,7 +101,6 @@ int ft_square_check(int x, int y, char num)
         {
             if (g_sudoku[i][j] == num)
             {
-                //write(1, "Square - True\n", 14);
                 return (1);
             }
             j++;
@@ -102,7 +108,6 @@ int ft_square_check(int x, int y, char num)
         j = y;
         i++;
     }
-    //write(1, "Square - False\n", 15);
     return (0);
 }
 
@@ -120,7 +125,6 @@ int solve_sudoku(int x, int y)
     {
         if (x == 8 && y == 8)
         {
-            //True condition, exit the function
             return 1;
         }
         if (x < 8)
@@ -135,7 +139,6 @@ int solve_sudoku(int x, int y)
 
         if (solve_sudoku(x, y))
         {
-            //True condition, exit the function
             return 1;
         }
         else
@@ -168,7 +171,6 @@ int solve_sudoku(int x, int y)
 
                 if (solve_sudoku(tx, ty))
                 {
-                    //True condition, exit the function
                     return 1;
                 }
             }
@@ -176,11 +178,11 @@ int solve_sudoku(int x, int y)
             num++;
         }
         g_sudoku[x][y] = '.';
-        return 0;
     }
+	return 0;
 }
 
-void print_sudoku()
+void print_sudoku(void)
 {
     int i;
     int j;
@@ -204,10 +206,43 @@ void print_sudoku()
     }
 }
 
+int	validate_input(int argc, char **argv)
+{
+	int i;
+	int j;
+
+	if (argc != 10)
+		return (0);
+	i = 1;
+	while (i <= 9)
+	{
+		j = 0;
+		while (j < 9)
+		{
+			if (argv[i][j] == '\0'
+				|| !((argv[i][j] <= '9' && argv[i][j] >= '1')
+					|| argv[i][j] == '.'))
+				return (0);
+			j++;
+		}
+		if (argv[i][j] != '\0')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 int main(int argc, char **argv)
 {
     int i = 1;
     int j = 0;
+
+if (!validate_input(argc,argv))
+{
+	write(1, "Error\n", 6);
+	return (0);
+}
+
     if (argc == 10)
     {
         while (i < argc)
@@ -224,6 +259,7 @@ int main(int argc, char **argv)
     else
     {
         write(1, "Error\n", 6);
+		return (0);
     }
     solve_sudoku(0, 0);
     print_sudoku();
